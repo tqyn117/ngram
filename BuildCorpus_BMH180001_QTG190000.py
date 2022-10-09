@@ -123,9 +123,9 @@ def buildKnowledgeBase():
 
 if __name__ == '__main__':
     # Topic is Horror film
-    #url_list = crawler("https://en.wikipedia.org/wiki/Horror_film")
-    #scraper(url_list)
-    #process()
+    url_list = crawler("https://en.wikipedia.org/wiki/Horror_film")
+    scraper(url_list)
+    process()
     extractFrequent()
     top10 = ['films', 'horror', 'smile', 'trailer', 'scream', 'hours', 'family', 'dark', 'blumhouse', 'think']
     buildKnowledgeBase()
