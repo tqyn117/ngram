@@ -6,6 +6,11 @@ from os import listdir
 from os.path import isfile, join
 import re
 from nltk import sent_tokenize
+from nltk import word_tokenize
+from nltk.corpus import stopwords
+from nltk.probability import FreqDist
+
+STOPWORDS = set(stopwords.words('english'))
 
 
 def crawler(starter_url):
@@ -52,7 +57,7 @@ def crawler(starter_url):
                         queue.append(link_str)
                         count += 1
                         if count >= 3:
-                            break;
+                            break
     return crawled
 
 
@@ -84,8 +89,43 @@ def process():
         pickle.dump(sent_tokens, open('processed_scraped/{}'.format(file), 'wb'))
 
 
+def extractFrequent():
+    # Extract important words from the processed text
+    files = [f for f in listdir('processed_scraped') if isfile(join('processed_scraped', f))]
+    for file in files:
+        tokens = []
+        raw_text = pickle.load(open('processed_scraped/{}'.format(file), 'rb'))
+        for sentence in raw_text:
+            sent = re.sub(r'[^\w\s]', '', sentence)
+            tokens += word_tokenize(sent)
+        no_stop = [w for w in tokens if not w.lower() in STOPWORDS]
+        freq = FreqDist(no_stop)
+        frequent = freq.most_common(25)
+        print(frequent)
+        # Write the important terms into a file using pickle
+        pickle.dump(frequent, open('important_terms/{}'.format(file), 'wb'))
+
+
+def buildKnowledgeBase():
+    knowledge_base = {
+        'films': 'Motion pictures date all the way back to the 1890s when the first moving picture cameras were invented.',
+        'horror': '\'Horror\' comes from a Latin verb meaning \"to bristle\" or \"to shudder.\"',
+        'smile': 'Smiling can actually help us live longer.',
+        'trailer': 'The first trailer was released in 1913.',
+        'scream': 'Screaming is exhibited by many animals, but no species uses this extreme vocalization in as many different contexts as humans.',
+        'hours': 'There is slightly less than 24 hours in a day',
+        'family': 'A family is complete with or without children, as long as there is an association of two or more persons.',
+        'dark': 'The fear of the darkness is called Nyctophobia.',
+        'blumhouse': 'Blumhouse Pictures produced the box office hit Tooth Fairy, starring Dwayne \"The Rock\" Johnson.',
+        'think': 'The average person has around 70 thousand thoughts per day.'
+    }
+    pickle.dump(knowledge_base, open('knowledge_base', 'wb'))
+
 if __name__ == '__main__':
     # Topic is Horror film
-    url_list = crawler("https://en.wikipedia.org/wiki/Horror_film")
-    scraper(url_list)
-    process()
+    #url_list = crawler("https://en.wikipedia.org/wiki/Horror_film")
+    #scraper(url_list)
+    #process()
+    extractFrequent()
+    top10 = ['films', 'horror', 'smile', 'trailer', 'scream', 'hours', 'family', 'dark', 'blumhouse', 'think']
+    buildKnowledgeBase()
