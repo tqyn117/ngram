@@ -1,3 +1,6 @@
+# Brenden Healey BMH180001
+# Quy Giang QTG190000
+
 from bs4 import BeautifulSoup
 import requests
 import urllib.request
